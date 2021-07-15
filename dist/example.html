@@ -1,0 +1,95 @@
+<html>
+<head>
+	<script src="pbgif.min.js"></script>
+	<title>GIF Test</title>
+</head>
+<body>
+	<canvas id="viewport"></canvas>
+	<script>
+		( async () => {
+			let gifData = await fetchGif( "https://media.giphy.com/media/6E5UgTuvUR0b3OLgWV/giphy.gif" );
+			console.dir( gifData );
+
+			// Get the canvas and context
+			var canvas = document.getElementById( "viewport" );
+			var context = canvas.getContext( "2d" );
+
+			// Define the image dimensions
+			var width = gifData[ 0 ].dims.width;
+			var height = gifData[ 0 ].dims.height;
+
+			canvas.width = width;
+			canvas.height = height;
+
+			// Create an ImageData object
+			var imagedata = context.createImageData( width, height );
+
+			// Create the image
+			function drawImage( frame = 0 ) {
+				if( gifData[ frame ].disposalType === 1 ) {
+					// Preserve Original Pixels
+					const dstData = context.getImageData( gifData[ frame ].dims.left, gifData[ frame ].dims.top, width, height );
+					for( let y = 0; y < height; y++ ) {
+						for( let x = 0; x < width; x++ ) {
+							// Draw and skip transparent pixels for interlaced animations
+							if( gifData[ frame ].pixels[ y * width + x ] !== gifData[ frame ].transparentIndex ) {
+								imagedata.data[ y * width * 4 + x * 4 + 0 ] = gifData[ frame ].patch[ y * width * 4 + x * 4 + 0 ];
+								imagedata.data[ y * width * 4 + x * 4 + 1 ] = gifData[ frame ].patch[ y * width * 4 + x * 4 + 1 ];
+								imagedata.data[ y * width * 4 + x * 4 + 2 ] = gifData[ frame ].patch[ y * width * 4 + x * 4 + 2 ];
+								imagedata.data[ y * width * 4 + x * 4 + 3 ] = gifData[ frame ].patch[ y * width * 4 + x * 4 + 3 ];
+							}
+							else {
+								imagedata.data[ y * width * 4 + x * 4 + 0 ] = dstData.data[ y * width * 4 + x * 4 + 0 ];
+								imagedata.data[ y * width * 4 + x * 4 + 1 ] = dstData.data[ y * width * 4 + x * 4 + 1 ];
+								imagedata.data[ y * width * 4 + x * 4 + 2 ] = dstData.data[ y * width * 4 + x * 4 + 2 ];
+								imagedata.data[ y * width * 4 + x * 4 + 3 ] = dstData.data[ y * width * 4 + x * 4 + 3 ];
+							}
+						}
+					}
+				}
+				else {
+					// Overwrite everything!
+					// NOTE: The following works only for non-interlaced
+					imagedata.data.set( gifData[ frame ].patch );
+				}
+			}
+
+			let prevtime = 0;
+			let totalTime = gifData.reduce( ( total, curr ) => total + curr.delay, 0 );
+			console.log( totalTime );
+
+			// Main loop
+			function main( currentTime ) {
+				// Request animation frames
+				window.requestAnimationFrame( main );
+
+				const frameTime = currentTime % totalTime;
+				let currentFrame = 0;
+				let timeSum = 0;
+				for( let f = 0; f < gifData.length; f++ ) {
+					if( timeSum <= frameTime && frameTime <= timeSum + gifData[ f ].delay ) {
+						currentFrame = f;
+						break;
+					}
+					timeSum += gifData[ f ].delay;
+				}
+
+				prevtime = currentTime;
+				if( width !== gifData[ currentFrame ].dims.width || height !== gifData[ currentFrame ].dims.height ) {
+					width = gifData[ currentFrame ].dims.width;
+					height = gifData[ currentFrame ].dims.height;
+
+					// Create an ImageData object
+					imagedata = context.createImageData( width, height );
+				}
+				drawImage( currentFrame );
+				// Draw the image data to the canvas
+				context.putImageData( imagedata, gifData[ currentFrame ].dims.left, gifData[ currentFrame ].dims.top );
+			}
+
+			// Call the main loop
+			main( 0 );
+		})();
+	</script>
+</body>
+</html>
