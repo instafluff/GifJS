@@ -12,7 +12,10 @@
 		"url": "git+https://github.com/instafluff/PeanutButterGIF.git"
 	},
 	"keywords": [
+		"peanut butter",
+		"jelly time",
 		"GIF",
+		"pbgif",
 		"decode",
 		"js",
 		"JavaScript",
@@ -20,7 +23,9 @@
 		"Instafluff",
 		"easy",
 		"simple",
-		"animation"
+		"animation",
+		"web",
+		"html"
 	],
 	"author": "Instafluff",
 	"license": "MIT",
