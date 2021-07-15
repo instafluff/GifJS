@@ -1,0 +1,36 @@
+{
+	"name": "peanutbuttergif",
+	"version": "1.0.0",
+	"description": "Comfiest GIF Decoder for the Web!",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "parcel build build.js --out-dir dist --out-file pbgif.min.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/instafluff/PeanutButterGIF.git"
+	},
+	"keywords": [
+		"GIF",
+		"decode",
+		"js",
+		"JavaScript",
+		"frames",
+		"Instafluff",
+		"easy",
+		"simple",
+		"animation"
+	],
+	"author": "Instafluff",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/instafluff/GifJS/issues"
+	},
+	"homepage": "https://github.com/instafluff/GifJS#readme",
+	"devDependencies": {
+		"gifuct-js": "^2.1.1",
+		"parcel-bundler": "^1.12.5"
+	},
+	"dependencies": {}
+}
